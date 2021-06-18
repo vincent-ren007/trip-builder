@@ -13,9 +13,19 @@
             body {
                 font-family: 'Nunito', sans-serif;
             }
+            .container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                align-content: center;
+            }
         </style>
     </head>
     <body class="antialiased">
-        <p>Under Construction ...</p>
+        <div class='container'>
+            <h1>Trip Builder</h1>
+            <p><a href='/docs'>API documentation</a></p>
+        </div>
     </body>
 </html>

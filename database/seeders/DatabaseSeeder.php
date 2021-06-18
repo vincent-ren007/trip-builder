@@ -13,6 +13,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        $this->call([
+            AirportSeeder::class,
+            AirlineSeeder::class,
+            FlightSeeder::class,
+            //RouteSeeder::class,
+        ]);
     }
 }
