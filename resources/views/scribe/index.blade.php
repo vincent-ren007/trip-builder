@@ -50,7 +50,7 @@
                             <li><a href="{{ route("scribe.openapi") }}">View OpenAPI spec</a></li>
                     </ul>
             <ul class="toc-footer" id="last-updated">
-            <li>Last updated: June 20 2021</li>
+            <li>Last updated: July 9 2021</li>
         </ul>
 </div>
 <div class="page-wrapper">
@@ -203,7 +203,7 @@ fetch(url, {
 <label data-endpoint="POSTapi-flight-search" hidden><input type="radio" name="keep_going_forward" value="true" data-endpoint="POSTapi-flight-search" data-component="body" ><code>true</code></label>
 <label data-endpoint="POSTapi-flight-search" hidden><input type="radio" name="keep_going_forward" value="false" data-endpoint="POSTapi-flight-search" data-component="body" ><code>false</code></label>
 <br>
-<p>if true, ever further flight should get closer to the destination, otherwise may not, default value true.</p>        </p>
+<p>if true, every further flight should get closer to the destination, otherwise may not, default value true.</p>        </p>
     
     </form>
 

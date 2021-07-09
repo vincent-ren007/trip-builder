@@ -2,6 +2,8 @@
 
 namespace App\Utilities;
 
+use Illuminate\Http\Request;
+
 use App\Models\Airline;
 use App\Models\Airport;
 use App\Models\Flight;
@@ -18,9 +20,17 @@ class TripBuilder {
     protected static $keepGoingForward;
     protected static $restrictAirlines;
 
-    public static function search($departureLocation, $destinationLocation, $departureDate,
-        $returnDate = null, $restrictAirlines = '', $pageSize = 20, $pageNumber = 1, $sortBy = 'duration',
-        $maxmumStops = 1, $keepGoingForward = true){
+    public static function search(Request $request){
+        $departureLocation = $request->input('departure_location');
+        $destinationLocation = $request->input('destination_location');
+        $departureDate = $request->input('departure_date');
+        $returnDate = $request->input('return_date', '');
+        $restrictAirlines = $request->input('restrict_airlines', '');
+        $pageSize = $request->input('page_size', 20);
+        $pageNumber = $request->input('page_number', 1);
+        $sortBy = $request->input('sort_by', 'duration');
+        $maxmumStops = $request->input('maxmum_stops', 2);
+        $keepGoingForward = $request->boolean('keep_going_forward', true);
 
         self::$maxmumStops = $maxmumStops;
         self::$keepGoingForward = $keepGoingForward;
@@ -48,10 +58,11 @@ class TripBuilder {
         self::buildRoutes($destinationAirports, $departureAirports);
         $validReturnRoutes = self::$validRoutes;
         $validReturnRoutes = self::calculateFlightDatetime($validReturnRoutes, $returnDate); 
-
         $comboRoutes = self::generateCombo($validOnwardRoutes, $validReturnRoutes);
-
         $formattedRoutes = self::formatRoutes($comboRoutes, $sortBy, $pageSize, $pageNumber, $returnDate);
+
+        self::$validRoutes = [];
+
         return $formattedRoutes;
     }
 
@@ -68,12 +79,9 @@ class TripBuilder {
             ];
         }
 
-        $sortBy == 'duration' && usort($formattedRoutes,
-            function($a, $b){return $a['duration_in_seconds'] - $b['duration_in_seconds'];});
-        $sortBy == 'price' && usort($formattedRoutes,
-            function($a, $b){return $a['price'] - $b['price'];});
-        $sortBy == 'stops' && usort($formattedRoutes,
-            function($a, $b){return $a['stops'] - $b['stops'];});
+        $sortBy == 'duration' && usort($formattedRoutes, function($a, $b){return $a['duration_in_seconds'] - $b['duration_in_seconds'];});
+        $sortBy == 'price' && usort($formattedRoutes, function($a, $b){return $a['price'] - $b['price'];});
+        $sortBy == 'stops' && usort($formattedRoutes, function($a, $b){return $a['stops'] - $b['stops'];});
 
         $chunkedRoutes = array_chunk($formattedRoutes, $pageSize);
         $pageNumber > count($chunkedRoutes) && $pageNumber = count($chunkedRoutes);
@@ -165,12 +173,12 @@ class TripBuilder {
             $currentAirportCoordinates->longitude,
             $destinationAirportCoordinates->latitude,
             $destinationAirportCoordinates->longitude)
-        > 
-        self::getDistance(
-            $nextAirportCoordinates->latitude,
-            $nextAirportCoordinates->longitude,
-            $destinationAirportCoordinates->latitude,
-            $destinationAirportCoordinates->longitude);
+            >
+            self::getDistance(
+                $nextAirportCoordinates->latitude,
+                $nextAirportCoordinates->longitude,
+                $destinationAirportCoordinates->latitude,
+                $destinationAirportCoordinates->longitude);
     }
 
     protected static function generateCombo($onwardRoutes, $returnRoutes){
@@ -238,8 +246,8 @@ class TripBuilder {
      * @return float Distance between points in [m] (same as earthRadius)
      */
     protected static function getDistance(
-        $latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo, $earthRadius = 6371000)
-    {
+        $latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo, $earthRadius = 6371000){
+
         // convert from degrees to radians
         $latFrom = deg2rad($latitudeFrom);
         $lonFrom = deg2rad($longitudeFrom);

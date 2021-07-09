@@ -23,7 +23,7 @@ class Flight extends Controller{
      */
     public function search(Request $request){
         $request->headers->set('accept', 'application/json');
-        $validated = $request->validate([
+        $request->validate([
             'departure_location' => 'required|regex:/^[A-Z]{3}$/',
             'destination_location' => 'required|regex:/^[A-Z]{3}$/',
             'departure_date' => 'required|date|after:now',
@@ -36,18 +36,11 @@ class Flight extends Controller{
             'keep_going_forward' => 'boolean',
         ]);
 
-        $routes = TripBuilder::search(
-            $request->input('departure_location'),
-            $request->input('destination_location'),
-            $request->input('departure_date'),
-            $request->input('return_date', ''),
-            $request->input('restrict_airlines', ''),
-            $request->input('page_size', 20),
-            $request->input('page_number', 1),
-            $request->input('sort_by', 'duration'),
-            $request->input('maxmum_stops', 2),
-            $request->boolean('keep_going_forward', true)
-        );
+        try{
+            $routes = TripBuilder::search($request);
+        }catch(\Exception $e){
+            return response(['message' => 'Fail to build routes.'], 500);
+        }
 
         return response()->json($routes);
     }

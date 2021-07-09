@@ -73,7 +73,7 @@ endpoints:
         type: number
       keep_going_forward:
         name: keep_going_forward
-        description: 'if true, ever further flight should get closer to the destination, otherwise may not, default value true.'
+        description: 'if true, every further flight should get closer to the destination, otherwise may not, default value true.'
         required: false
         example: true
         type: boolean
